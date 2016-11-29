@@ -6484,13 +6484,14 @@ lf.backstore.IndexedDBTx.prototype.getTable = function(tableName, deserializeFn,
 lf.backstore.IndexedDBTx.prototype.commitInternal = function() {
   return this.resolver.promise;
 };
-lf.backstore.IndexedDB = function(global, schema) {
+lf.backstore.IndexedDB = function(global, schema, indexedDB) {
+  this.indexedDB_ = indexedDB;
   this.global_ = global;
   this.schema_ = schema;
   this.bundledMode_ = schema.pragma_.enableBundledMode || !1;
 };
 lf.backstore.IndexedDB.prototype.init = function(opt_onUpgrade) {
-  var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+  var indexedDB = this.indexedDB_ || window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
   if (!goog.isDefAndNotNull(indexedDB)) {
     throw new lf.Exception(352);
   }
@@ -11406,7 +11407,7 @@ lf.base.init = function(global, opt_options) {
     }
     switch(dataStoreType) {
       case lf.schema.DataStoreType.INDEXED_DB:
-        backStore = new lf.backstore.IndexedDB(global, schema);
+        backStore = new lf.backstore.IndexedDB(global, schema, options.indexedDB);
         break;
       case lf.schema.DataStoreType.MEMORY:
         backStore = new lf.backstore.Memory(schema);
